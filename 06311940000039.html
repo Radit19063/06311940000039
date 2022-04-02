@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Radit Candra Nugroho - 06311940000039</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+
+    <div>
+        <canvas id="myChart"></canvas>
+    </div>
+
+    <script>
+
+        const DATA_COUNT = 5;
+        const NUMBER_CFG = { count: DATA_COUNT, min: 0, max: 100000 };
+
+        const data = {
+            //BA = Bencana Alam
+            //BS = Bencana Sosial
+            //BNAP = Bencana Non Alam dan Penyakit
+            labels: ['BNAP2020', 'BNAP2019',
+                'BA2020', 'BA2019',
+                'BS2020', 'BS2019',
+            ],
+            datasets: [
+                {
+                    backgroundColor: ['hsl(0, 100%, 60%)', 'hsl(0, 100%, 35%)'],
+                    data: [37823, 14338]
+                },
+                {
+                    backgroundColor: ['#9400D3', '#1E90FF'],
+                    data: [, , 236, 352]
+                },
+                {
+                    backgroundColor: ['hsl(180, 100%, 60%)', 'hsl(180, 100%, 35%)'],
+                    data: [, , , , 4, 7]
+                }
+            ]
+        };
+
+        const config = {
+            type: 'pie',
+            data: data,
+            options: {
+                animations: {
+                    y: {
+                        easing: 'easeInOutElastic',
+                        from: (ctx) => {
+                            if (ctx.type === 'data') {
+                                if (ctx.mode === 'default' && !ctx.dropped) {
+                                    ctx.dropped = true;
+                                    return 0;
+                                }
+                            }
+                        }
+                    }
+                },
+                
+                responsive: true,
+                plugins: {
+                    legend: {
+                        labels: {
+                            generateLabels: function (chart) {
+                                // Get the default label list
+                                const original = Chart.overrides.pie.plugins.legend.labels.generateLabels;
+                                const labelsOriginal = original.call(this, chart);
+
+                                // Build an array of colors used in the datasets of the chart
+                                let datasetColors = chart.data.datasets.map(function (e) {
+                                    return e.backgroundColor;
+                                });
+                                datasetColors = datasetColors.flat();
+
+                                // Modify the color and hide state of each label
+                                labelsOriginal.forEach(label => {
+                                    // There are twice as many labels as there are datasets. This converts the label index into the corresponding dataset index
+                                    label.datasetIndex = (label.index - label.index % 2) / 2;
+
+                                    // The hidden state must match the dataset's hidden state
+                                    label.hidden = !chart.isDatasetVisible(label.datasetIndex);
+
+                                    // Change the color to match the dataset
+                                    label.fillStyle = datasetColors[label.index];
+                                });
+
+                                return labelsOriginal;
+                            }
+                        },
+                        onClick: function (mouseEvent, legendItem, legend) {
+                            // toggle the visibility of the dataset from what it currently is
+                            legend.chart.getDatasetMeta(
+                                legendItem.datasetIndex
+                            ).hidden = legend.chart.isDatasetVisible(legendItem.datasetIndex);
+                            legend.chart.update();
+                        }
+                    },
+                    title: {
+                        display: true,
+                        text: 'Total Kematian Tahun 2019 - 2020'
+
+                    }
+                }
+                //ANIMATION
+                
+            },
+        };
+
+
+    </script>
+
+
+    <script>
+        const myChart = new Chart(
+            document.getElementById('myChart'),
+            config
+        );
+    </script>
+
+</body>
+
+</html>
